@@ -2,6 +2,7 @@ import random
 import time
 import pygame as pg
 import gfx
+import constants as c
 
 #STATE
 IDLE = 'idle'
@@ -53,19 +54,19 @@ class Plant(Sprite):
         super().__init__(name)
         self.gm = gm
         self.rect.center = center
-        self.shoot_speed = 0.3 #发射速度
+        self.shoot_speed = 0.2 #发射速度
         self.shoot_time = 0
         self.energy = 0
         
     def update(self):
         key_pressed = pg.key.get_pressed()
-        if key_pressed[pg.K_d] and self.rect.right < 1000:
+        if key_pressed[pg.K_d] and self.rect.right < c.SCREEN_WIDTH:
             self.rect.right = self.rect.right + 4
-        if key_pressed[pg.K_a] and self.rect.left > 150:
+        if key_pressed[pg.K_a] and self.rect.left > 230:
             self.rect.left  =self.rect.left -4
-        if key_pressed[pg.K_w] and self.rect.top > 0:
+        if key_pressed[pg.K_w] and self.rect.top > 40:
             self.rect.top -= 4
-        if key_pressed[pg.K_s] and self.rect.bottom < 570:
+        if key_pressed[pg.K_s] and self.rect.bottom < c.SCREEN_HEIGHT-220:
             self.rect.bottom += 4
         if key_pressed[pg.K_SPACE]:
             self.shoot()
@@ -198,7 +199,36 @@ class PropSprite(Sprite):
         self.disappear -= 0.016
         if self.disappear <= 0:
             self.kill()
-    
+
+# 车
+class Car(pg.sprite.Sprite):
+    def __init__(self, gm, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.gm = gm
+        rect = self.gm.gfx[c.CAR].get_rect()
+        width, height = rect.w, rect.h
+        self.image = gfx.get_image(self.gm.gfx[c.CAR], 0, 0, width, height)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.bottom = y
+        self.state = c.IDLE
+
+    def update(self):
+        if self.state == c.IDLE:
+            pass
+        elif self.state == c.WALK:
+            self.rect.x += 4
+        if self.rect.x > c.SCREEN_WIDTH:
+            self.kill()
+
+    def setWalk(self):
+        if self.state == c.IDLE:
+            self.state = c.WALK
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+ 
 # # 僵尸
 # class Zombie(Sprite):
 #     def __init__(self,name,speed,type,gm):

@@ -89,6 +89,13 @@ class Game():
                 for zombie,bullets in bullet_zombie_collider.items():
                     for bullet in bullets:
                         zombie.setDamage(bullet.damage, bullet.isIce)
+        
+        car_zombie_collider = pg.sprite.groupcollide(self.plant_manager.car_group, self.zombie_manager.zombie_group, False, False)
+        if len(car_zombie_collider) > 0:
+                for car,zombies in car_zombie_collider.items():
+                    car.setWalk()
+                    for zombie in zombies:
+                        zombie.setDamage(zombie.health)
     
     def game_failed(self):
         self.audio_player.play_failed()
@@ -111,13 +118,22 @@ class PlantManage:
     def __init__(self,gm):
         self.gm = gm
         self.plant_group = pg.sprite.Group()
+        self.car_group = pg.sprite.Group()
         # 创建玩家
         # self.player = sprite.PlayerSprite("resource/image/actor/Peashooter_0.png",(71,71),self.gm)
-        self.player = sprite.PeaShooter("resource/image/actor/Peashooter_0.png",(71,71),self.gm)
+        self.player = sprite.PeaShooter("resource/image/actor/Peashooter_0.png",(230,150),self.gm)
+        # 创建车
+        index = 0
+        while index < 5:
+            index += 1
+            car = sprite.Car(self.gm, 150, 50+100*index)
+            self.car_group.add(car)
         self.player.add(self.plant_group)
     def update(self):
         self.plant_group.update()
         self.plant_group.draw(self.gm.screen)
+        self.car_group.update()
+        self.car_group.draw(self.gm.screen)
         
     # 切换成普通豌豆射手
     def switch_peashooter(self, center, energy):
